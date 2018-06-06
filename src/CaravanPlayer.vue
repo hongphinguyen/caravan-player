@@ -1,5 +1,5 @@
 <template>
-  <div id="caravanPlayer" :style="wrapperStyle">
+  <div :style="wrapperStyle">
     <div v-if="playerType === 'static'" :class="`music-player ${type ? type : 'footer'}`">
       <img class="player-icon" :src="volumeIcon" @click="onVolumeButtonClick">
       <img class="player-icon" :src="require('@/assets/icons/Previous.png')" 
@@ -84,10 +84,10 @@
 
 <script lang='ts'>
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { mod, randRange } from '@/scripts/MathTool';
+import { mod, randRange } from './scripts/MathTool';
 import { clearInterval, setInterval } from 'timers';
-import { getHHMMSS } from '@/scripts/TimerTool';
-import Slider from '@/components/Slider.vue';
+import { getHHMMSS } from './scripts/TimerTool';
+import Slider from './components/Slider.vue';
 
 interface SongMetadata {
   file: any;
