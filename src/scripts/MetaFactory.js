@@ -1,7 +1,7 @@
 const id3 = require('node-id3');
 const fs = require('fs');
 
-const dir = '../../../..';
+const dir = '../../../../src/assets/caravan-music/';
 const bankOutputDir = './';
 
 /* Returns a promise that contains an array of files in a folder */
@@ -72,7 +72,6 @@ const writeMetaFile = arr => new Promise((resolve, reject) => {
 
 async function main() {
   console.log('Generating meta file');
-  dir += prompt('Please provide the absolute path to your music folder (i.e. /src/assets/music/)');
   const folder = await getFilesInFolder(dir);
   const folderTags = [];
   const albumArtsBuffers = [];

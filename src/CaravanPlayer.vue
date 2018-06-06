@@ -88,14 +88,7 @@ import { mod, randRange } from './scripts/MathTool';
 import { clearInterval, setInterval } from 'timers';
 import { getHHMMSS } from './scripts/TimerTool';
 import Slider from './components/Slider.vue';
-
-interface SongMetadata {
-  file: any;
-  title: string;
-  album: string;
-  artist: string;
-  art: any;
-}
+import { SongBank, SongMetadata } from './scripts/SongBank';
 
 interface MarqueeGroupSet {
   text: string;
@@ -109,10 +102,12 @@ interface MarqueeGroupSet {
   components: { Slider }
 })
 export default class CaravanPlayer extends Vue {
-  @Prop() private songBank!: SongMetadata[];
   @Prop() private type!: string;
   @Prop() private noMarquee!: boolean;
   @Prop() private stateless!: boolean;
+  @Prop() private height!: number;
+  @Prop() private width!: number;
+  private songBank = SongBank;
   private timeUpdateListener: any;
   private duration = 0;
   private currentTimeToDisplay = '00:00:00';
@@ -174,8 +169,8 @@ export default class CaravanPlayer extends Vue {
   }
   get wrapperStyle(): object {
     return this.playerType === 'instance' ? {
-      width: '90%',
-      height: '500px',
+      width: this.width || '90%',
+      height: this.height || '500px',
       display: 'inline-block',
       background: '#354b68',
       boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12)'

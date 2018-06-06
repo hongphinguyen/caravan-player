@@ -1,6 +1,6 @@
 {
   "name": "caravan-player",
-  "version": "1.0.5",
+  "version": "1.0.9",
   "author": "Phi Nguyen floyd_spiky@hotmail.com",
   "description": "A VueJS Music Player",
   "main": "src/main.ts",
