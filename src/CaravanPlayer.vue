@@ -107,6 +107,7 @@ export default class CaravanPlayer extends Vue {
   @Prop() private stateless!: boolean;
   @Prop() private height!: number;
   @Prop() private width!: number;
+  @Prop() private extraStyle!: object;
   private songBank = SongBank;
   private timeUpdateListener: any;
   private duration = 0;

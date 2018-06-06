@@ -1,4 +1,4 @@
-# Caravan Player
+# Caravan Player - VueJS music-playing component
 
 #### Please visit this [DEMO PAGE](https://caravan-player.firebaseapp.com/#/) to get an idea of how Caravan Player works.
 
