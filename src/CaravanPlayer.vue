@@ -178,7 +178,7 @@ export default class CaravanPlayer extends Vue {
   }
   get currentSongTitle(): string {
     const title = this.songBank[this.currentSong].title;
-    if (!this.noMarquee) {
+    if (!this.noMarquee && this.type === 'footer' || this.type === 'header') {
       if (title.length >= this.maxTextLength && !this.mqTitle.initial) {
         this.mqTitle.text = title.substr(0, this.maxTextLength);
         this.mqTitle.initial = true;
@@ -244,7 +244,7 @@ export default class CaravanPlayer extends Vue {
     this.setMarquee(this.mqArtist, this.mqArtist.keyword);
   }
   private setMarquee(marqueeGroupSet: MarqueeGroupSet, mode: string): void {
-    if (this.noMarquee) { return; }
+    if (this.noMarquee || this.type !== 'footer' && this.type !== 'header') { return; }
     clearInterval(marqueeGroupSet.intervalObj);
     marqueeGroupSet.intervalObj = setInterval(() => {
       let original = '';
@@ -615,7 +615,4 @@ $primary-color: #293c50;
     }
   }
 }
-
-
-
 </style>

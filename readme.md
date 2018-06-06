@@ -14,6 +14,9 @@ Create a folder named 'caravan-player' (case-sensitive) in the 'assets' folder i
 ./src/assets/caravan-player
 ```
 Put all your music files into this folder.  Make sure the mp3 file has the required id3 tags and an album art.
+
+##### You have to redo this step everytime you make an update to a newer Caravan Player version.
+
 #####  Right now only .mp3 files are allowed. I will add more audio extensions support in the future.
 
 ### Step 3: Run this script file:
