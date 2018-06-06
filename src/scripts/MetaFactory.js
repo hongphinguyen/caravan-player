@@ -56,11 +56,11 @@ const writeMetaFile = arr => new Promise((resolve, reject) => {
   fileString += 'export const SongBank: SongMetadata[] = [\n';
   for (const file of arr) {
     fileString += '  {\n';
-    fileString += `    file: require(\`@/assets/music/${file.filePath}\`),\n`;
+    fileString += `    file: require(\`@/assets/caravan-music/${file.filePath}\`),\n`;
     fileString += `    title: \`${file.title}\`,\n`;
     fileString += `    album: \`${file.album}\`,\n`;
     fileString += `    artist: \`${file.artist}\`,\n`;
-    fileString += `    art: require(\`@/assets/music/${file.artPath}\`)\n`;
+    fileString += `    art: require(\`@/assets/caravan-music/${file.artPath}\`)\n`;
     fileString += `  }${arr.indexOf(file) === arr.length - 1 ? '' : ','}\n`;
   }
   fileString += '];\n';
