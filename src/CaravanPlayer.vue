@@ -45,8 +45,8 @@
            @mouseover="cardHovered = !cardHovered"
            @mouseout="cardHovered = !cardHovered">
         <img :src="songBank[currentSong].art" :class="{ hovered: cardHovered }" alt="">
-        <div class="song-icon-overlay">
-          <img :src="playIcon" v-if="cardHovered" @click="playOrPause">
+        <div class="song-icon-overlay" @click="playOrPause">
+          <img :src="playIcon" v-if="cardHovered">
         </div>
         <div class="song-meta">
           <span>{{currentTimeToDisplay}} - {{durationToDisplay}} | </span>
