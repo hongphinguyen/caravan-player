@@ -8,7 +8,7 @@
 ```sh
 npm install --save caravan-player
 ```
-### Step 2: Put your music your files in the right folder:
+### Step 2: Put your music files in the right folder:
 Create a folder named 'caravan-player' (case-sensitive) in the 'assets' folder in your Vue project folder. The path to your music files now should be:
 ```sh
 ./src/assets/caravan-player
