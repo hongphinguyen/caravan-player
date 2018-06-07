@@ -125,8 +125,9 @@ export default class CaravanPlayer extends Vue {
   private volumeIcon: NodeRequire = require('@/assets/icons/VolumeHigh.png');
   private colorSet = {
     blue: '#293c50',
-    orange: '#d89312',
-    seafoam: '#17775f'
+    orange: '#d49113',
+    green: '#17775f',
+    purple: '#2f103d'
   }
   private mqTitle: MarqueeGroupSet = {
     text: '',
@@ -332,9 +333,10 @@ export default class CaravanPlayer extends Vue {
 <style lang="scss">
 
 $colors: (
-  seafoam: #17775f,
+  green: #17775f,
   blue: #293c50,
-  orange: #d89312
+  orange: #d49113,
+  purple: #2f103d
 );
 
 @font-face {
@@ -346,6 +348,8 @@ $colors: (
 
 * {
   font-family: 'Iosevka', Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 @each $colors, $primary in $colors {

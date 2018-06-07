@@ -48,7 +48,6 @@ export default class Slider extends Vue {
 }
 </script>
 
-
 <style lang="scss" scoped>
 
 h1 {
