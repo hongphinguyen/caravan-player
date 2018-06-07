@@ -26,7 +26,35 @@ import CaravanPlayer from 'caravan-player/src/CaravanPlayer.vue'
 
 #### And voila, Caravan Player is now ready to ride.
 
-##### OPTIONAL: Remember, every time you add a new song to the folder after the first install, the song won't be updated automatically. You can fix that by adding this to the project's package.json file:
+## Essential configurations for advanced users
+
+You don't have to follow these steps to make Caravan work. But, if you want to explore its full potential, here are a few things you can do:
+
+##### 1. One optional but very cool feature of Caravan Player is its ability to go stateful. If you want two (or more) instances of Caravan Player to mimic each other's action and share a global audio instance, you'll have to install Vuex (if you haven't already) and add these state and mutation properties to the store.js (or store.ts) file:
+
+```js
+state: {
+  audio: new Audio(),
+  playButton: 'Play',
+  currentSong: 0
+},
+mutations: {
+  setCurrentSong(state, index) {
+    state.currentSong = index;
+  },
+  setPlayButton(state, buttonLabel) {
+    state.playButton = buttonLabel;
+  }
+}
+```
+
+And when you create a new CaravanPlayer instance, just add a *stateful* prop and you're ready to go:
+
+```html
+<CaravanPlayer stateful/>
+```
+
+##### 2. Remember, every time you add a new song to the folder after the first install, the song won't be updated automatically. You can fix that by adding this to the project's package.json file:
 ```json
 "scripts": {
   "resync": "node ./node_modules/caravan-player/src/scripts/MetaFactoryRerun"

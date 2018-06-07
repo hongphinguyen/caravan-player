@@ -11,7 +11,7 @@
         <span>{{currentTimeToDisplay}}</span>
       </div>
       <Slider :boundValue="duration" :size="{ height: '30%', width: `${progressBarWidth}%` }"
-              :additionalStyle="{ margin: '0 20px 0 20px' }" orientation="horizontal" 
+              :additionalStyle="{ margin: '0 20px 0 20px' }" orientation="horizontal" :color="colorSet[color]"
               :clickEvent="{ event: (percentage) => audio.currentTime = percentage * audio.duration }"/>
       <div class="song-duration-end">
         <span>{{ durationToDisplay }}</span>
