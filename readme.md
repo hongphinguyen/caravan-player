@@ -26,7 +26,7 @@ import CaravanPlayer from 'caravan-player/src/CaravanPlayer.vue'
 
 #### And voila, Caravan Player is now ready to ride.
 
-##### OPTIONAL: Remember, every time you add a song to this folder, the song won't be updated automatically. You can fix that by adding this to the project's package.json file:
+##### OPTIONAL: Remember, every time you add a new song to the folder after the first install, the song won't be updated automatically. You can fix that by adding this to the project's package.json file:
 ```json
 "scripts": {
   "resync": "node ./node_modules/caravan-player/src/scripts/MetaFactoryRerun"
@@ -36,7 +36,7 @@ Then, every time you add a new song, just run:
 ```sh
 npm run resync
 ```
-And your new song will get updated.
+And your new song will get updated. If you run into any trouble doing this, just reinstall Caravan.
 
 ### As of now, the beta Caravan Player supports two types of music player:
 

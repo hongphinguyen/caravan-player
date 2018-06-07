@@ -104,7 +104,7 @@ interface MarqueeGroupSet {
 export default class CaravanPlayer extends Vue {
   @Prop({ default: 'footer' }) private type!: string;
   @Prop() private noMarquee!: boolean;
-  @Prop() private stateless!: boolean;
+  @Prop({ default: false }) private stateful!: boolean;
   @Prop({ default: '500px' }) private height!: string;
   @Prop({ default: '90%' }) private width!: string;
   @Prop({ default: 'blue' }) private color!: string;
@@ -117,6 +117,11 @@ export default class CaravanPlayer extends Vue {
   private maxTextLength = 15;
   private searchMode = false;
   private searchQuery = '';
+  private statelessGroupSet = {
+    audio: new Audio(),
+    playButton: 'Play',
+    currentSong: 0
+  }
   private volumeIcon: NodeRequire = require('@/assets/icons/VolumeHigh.png');
   private colorSet = {
     blue: '#293c50',
@@ -203,12 +208,16 @@ export default class CaravanPlayer extends Vue {
     return artist;
   }
   // State getters
-  get audio(): HTMLAudioElement { return this.$store.state.audio; }
-  get playButton(): string { return this.$store.state.playButton; }
+  get audio(): HTMLAudioElement {
+    return this.stateful ? this.$store.state.audio : this.statelessGroupSet.audio;
+  }
+  get playButton(): string { 
+    return this.stateful ? this.$store.state.playButton : this.statelessGroupSet.playButton;
+  }
   get currentSong(): number {
     this.resetMarquee(this.mqTitle);
     this.resetMarquee(this.mqArtist);
-    return this.$store.state.currentSong;
+    return this.stateful ? this.$store.state.currentSong : this.statelessGroupSet.currentSong;
   }
   private checkIfHighlight(song: SongMetadata): string {
     if (this.songBank.indexOf(song) === this.currentSong) {
@@ -282,10 +291,10 @@ export default class CaravanPlayer extends Vue {
   private playOrPause(): void {
     if (this.audio.paused) {
       this.audio.play();
-      this.$store.commit('setPlayButton', 'Pause');
+      this.togglePlayPause(false);
     } else {
       this.audio.pause();
-      this.$store.commit('setPlayButton', 'Play');
+      this.togglePlayPause(true);
     }
   }
   private nextOrPreviousSong(increment: boolean): void {
@@ -296,12 +305,25 @@ export default class CaravanPlayer extends Vue {
     this.changeSongTo(randRange(0, this.songBank.length));
   }
   private changeSongTo(index: number): void {
-    this.$store.commit('setCurrentSong', index);
+    if (this.stateful) {
+      this.$store.commit('setCurrentSong', index);
+    } else {
+      this.statelessGroupSet.currentSong = index;
+    }
     this.audio.src = this.songBank[index].file;
     if (!this.audio.paused) { return; }
     if (this.audio.paused) {
       this.audio.play();
-      this.$store.commit('setPlayButton', 'Pause');
+      this.togglePlayPause(false);
+    }
+  }
+  private togglePlayPause(play: boolean) {
+    let playPause;
+    playPause = play ? 'Play' : 'Pause';
+    if (this.stateful) {
+      this.$store.commit('setPlayButton', playPause);
+    } else {
+      this.statelessGroupSet.playButton = playPause
     }
   }
 }
@@ -314,6 +336,17 @@ $colors: (
   blue: #293c50,
   orange: #d89312
 );
+
+@font-face {
+  font-family: 'Iosevka';
+  src: url('./assets/fonts/Iosevka/iosevka-regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  font-family: 'Iosevka', Arial, Helvetica, sans-serif;
+}
 
 @each $colors, $primary in $colors {
   .player.#{$colors} {
