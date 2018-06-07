@@ -4,35 +4,41 @@
 
 #### Currenly supports Vue CLI 3.0. It will not work with older versions of Vue CLI.
 
-### Step 1: Install Caravan Player:
-```sh
-npm install --save caravan-player
-```
-### Step 2: Put your music files in the right folder:
+### Step 1: Put your music files in the designated folder (must be done before installing the package):
 Create a folder named 'caravan-player' (case-sensitive) in the 'assets' folder in your Vue project folder. The path to your music files now should be:
 ```sh
 ./src/assets/caravan-player
 ```
 Put all your music files into this folder.  Make sure the mp3 file has the required id3 tags and an album art.
 
-##### You have to redo this step everytime you make an update to a newer Caravan Player version.
-
 #####  Right now only .mp3 files are allowed. I will add more audio extensions support in the future.
 
-### Step 3: Run this script file:
-
-```ts
-cd ./node_modules/caravan-player/src/scripts
-node MetaFactory
+### Step 2: Install Caravan Player:
+```sh
+npm install --save caravan-player
 ```
 
-### Step 4: Import CaravanPlayer component to your Vue application:
+### Step 3: Import CaravanPlayer component to your Vue application:
 
 ```js
 import CaravanPlayer from 'caravan-player/src/CaravanPlayer.vue'
 ```
 
-#### As of now, the beta Caravan Player supports two types of music player:
+#### And voila, Caravan Player is now ready to ride.
+
+##### OPTIONAL: Remember, every time you add a song to this folder, the song won't be updated automatically. You can fix that by adding this to the project's package.json file:
+```json
+"scripts": {
+  "resync": "node ./node_modules/caravan-player/src/scripts/MetaFactoryRerun"
+}
+```
+Then, every time you add a new song, just run:
+```sh
+npm run resync
+```
+And your new song will get updated.
+
+### As of now, the beta Caravan Player supports two types of music player:
 
 ### The "footer" player:
 

@@ -1,6 +1,6 @@
 {
   "name": "caravan-player",
-  "version": "2.0.6",
+  "version": "2.0.15",
   "author": "Phi Nguyen floyd_spiky@hotmail.com",
   "description": "A VueJS Music Player",
   "keywords": [
@@ -9,8 +9,7 @@
   ],
   "main": "src/main.ts",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "postinstall": "node ./src/scripts/MetaFactory"
   },
   "dependencies": {
     "vue": "^2.5.16",

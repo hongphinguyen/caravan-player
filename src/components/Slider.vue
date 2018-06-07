@@ -1,6 +1,6 @@
 <template>
   <div class="outer-bar" :style="outerSize" ref="outerBar">
-    <div :class="`inner-bar ${orientation}`" ref="innerBar" :style="innerSize">
+    <div :class="`inner-bar ${orientation}`" ref="innerBar" :style="innerStyle">
     </div>
     <div class="overlay" @click="barClick" @mousedown="addBarListener"
          @mouseup="removeBarListener" @mouseout="removeBarListener">
@@ -17,6 +17,7 @@ export default class Slider extends Vue {
   @Prop() private clickEvent!: any;
   @Prop() private orientation!: string;
   @Prop() private maxWidth!: number;
+  @Prop({ default: '#293c50' }) private color!: string;
   @Prop() private size!: { height: string, weight: string };
   @Prop() private additionalStyle!: object;
   private mouseOver = true;
@@ -27,9 +28,10 @@ export default class Slider extends Vue {
       this.orientation === 'horizontal' ? { height: '50px', width: '500px' } : { height: '500px', width: '50px' };
     return this.additionalStyle ? Object.assign(this.additionalStyle, outerSize) : outerSize;
   }
-  private get innerSize(): object {
-    return this.orientation === 'horizontal' ? { height: 'calc(100% - 2px)', width: this.boundValue + '%' }
-      : { width: 'calc(100% - 2px)', height: `calc(${100 - this.boundValue}% - 2px)` };
+  private get innerStyle(): object {
+    const style = { background: this.color };
+    return Object.assign(this.orientation === 'horizontal' ? { height: 'calc(100% - 2px)', width: this.boundValue + '%' }
+      : { width: 'calc(100% - 2px)', height: `calc(${100 - this.boundValue}% - 2px)` }, style);
   }
   private barClick(event: MouseEvent): void {
     const clickPos = this.orientation === 'horizontal' ? event.offsetX : event.offsetY;
@@ -48,7 +50,6 @@ export default class Slider extends Vue {
 
 
 <style lang="scss" scoped>
-$primary-color: #2c3e50;
 
 h1 {
   color: rgb(243, 243, 234);
@@ -64,7 +65,6 @@ h1 {
 
 .inner-bar {
   position: absolute;
-  background-color: $primary-color;
   z-index: 1;
 }
 

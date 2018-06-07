@@ -1,6 +1,6 @@
 <template>
-  <div :style="wrapperStyle">
-    <div v-if="playerType === 'static'" :class="`music-player ${type ? type : 'footer'}`">
+  <div :class="`player ${color}`" :style="wrapperStyle">
+    <div v-if="playerType === 'static'" :class="`music-player-static ${type}`">
       <img class="player-icon" :src="volumeIcon" @click="onVolumeButtonClick">
       <img class="player-icon" :src="require('@/assets/icons/Previous.png')" 
            @click="nextOrPreviousSong(false)" alt="">
@@ -28,9 +28,9 @@
       <div class="catalogue" v-if="catalogue" :style="catalogueGroupSet">
         <input type="text" placeholder="Search a song..."
                class="search-input" v-model="searchQuery"/>
-        <div class="catalogue-item" v-for="(song, x) in songBank" :key="x"
-             @click="changeSongTo(songBank.indexOf(song)); catalogue = !catalogue;"
-             :style="checkIfHighlight(song)" :class="hiddenOnSearch(song)">
+        <div @click="changeSongTo(songBank.indexOf(song)); catalogue = !catalogue;"
+             :class="`catalogue-item ${checkIfHighlight(song)} ${hiddenOnSearch(song)}`"
+             v-for="(song, x) in songBank" :key="x">
           <div class="catalogue-art">
             <img :src="song.art"/>
           </div>
@@ -40,7 +40,7 @@
         </div>
       </div>
     </div>
-    <div v-else :class="`music-player-instance ${type}`">
+    <div v-else-if="type === 'card'" :class="`music-player-instance card`">
       <div class="song-info" 
            @mouseover="cardHovered = !cardHovered"
            @mouseout="cardHovered = !cardHovered">
@@ -60,7 +60,7 @@
         <input v-if="searchMode" class="search-input" v-model="searchQuery"
                type="text" :style="{ height: '45%', width: `calc(${progressBarWidth}% - 10px)` }"
                @keyup.esc="searchMode = !searchMode" placeholder="Search a song..."/>
-        <Slider v-else :additionalStyle="{ margin: '0 15px 0 15px' }" :boundValue="duration"
+        <Slider v-else :additionalStyle="{ margin: '0 15px 0 15px' }" :boundValue="duration" :color="colorSet[color]"
                 orientation="horizontal" :size="{ height: '30%', width: `${progressBarWidth}%`}"
                 :clickEvent="{ event: (percentage) => audio.currentTime = percentage * audio.duration }"/>
         <img class="player-icon" :src="require('@/assets/icons/Previous.png')" 
@@ -71,9 +71,9 @@
              @click="shuffle" alt="">
         </div>
       <div class="catalogue">
-        <div class="catalogue-item" v-for="(song, x) in songBank" :key="x"
+        <div :class="`catalogue-item ${checkIfHighlight(song)} ${hiddenOnSearch(song)}`"
              @click="changeSongTo(songBank.indexOf(song)); catalogue = !catalogue;"
-             :class="hiddenOnSearch(song)" :style="checkIfHighlight(song)">
+             v-for="(song, x) in songBank" :key="x">
           <div class="catalogue-art"><img :src="song.art"/></div>
           <div class="catalogue-title"><span>{{song.artist}} - {{song.title}}</span></div>
         </div>
@@ -102,12 +102,12 @@ interface MarqueeGroupSet {
   components: { Slider }
 })
 export default class CaravanPlayer extends Vue {
-  @Prop() private type!: string;
+  @Prop({ default: 'footer' }) private type!: string;
   @Prop() private noMarquee!: boolean;
   @Prop() private stateless!: boolean;
-  @Prop() private height!: number;
-  @Prop() private width!: number;
-  @Prop() private extraStyle!: object;
+  @Prop({ default: '500px' }) private height!: string;
+  @Prop({ default: '90%' }) private width!: string;
+  @Prop({ default: 'blue' }) private color!: string;
   private songBank = SongBank;
   private timeUpdateListener: any;
   private duration = 0;
@@ -118,6 +118,11 @@ export default class CaravanPlayer extends Vue {
   private searchMode = false;
   private searchQuery = '';
   private volumeIcon: NodeRequire = require('@/assets/icons/VolumeHigh.png');
+  private colorSet = {
+    blue: '#293c50',
+    orange: '#d89312',
+    seafoam: '#17775f'
+  }
   private mqTitle: MarqueeGroupSet = {
     text: '',
     intervalObj: setInterval(() => {/*Does nothing*/}, 100000),
@@ -170,10 +175,9 @@ export default class CaravanPlayer extends Vue {
   }
   get wrapperStyle(): object {
     return this.playerType === 'instance' ? {
-      width: this.width || '90%',
-      height: this.height || '500px',
+      width: this.width,
+      height: this.height,
       display: 'inline-block',
-      background: '#354b68',
       boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12)'
     } : {};
   }
@@ -206,11 +210,11 @@ export default class CaravanPlayer extends Vue {
     this.resetMarquee(this.mqArtist);
     return this.$store.state.currentSong;
   }
-  private checkIfHighlight(song: SongMetadata): object {
+  private checkIfHighlight(song: SongMetadata): string {
     if (this.songBank.indexOf(song) === this.currentSong) {
-      return { background: '#1f2a36' };
+      return 'playing';
     }
-    return {};
+    return '';
   }
   private onVolumeButtonClick(): void {
     switch (this.audio.volume) {
@@ -304,315 +308,320 @@ export default class CaravanPlayer extends Vue {
 </script>
 
 <style lang="scss">
-$primary-color: #293c50;
 
-.music-player-instance {
-  height: 400px;
-}
+$colors: (
+  seafoam: #17775f,
+  blue: #293c50,
+  orange: #d89312
+);
 
-.music-player.footer { bottom: 0; }
-.music-player.header { top: 0; }
+@each $colors, $primary in $colors {
+  .player.#{$colors} {
 
-.music-player {
-  background-color: $primary-color;
-  height: 50px;
-  color: white;
-  position: fixed;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 99;
-  border-top: 1px solid black;
+    .music-player-static.footer { bottom: 0; }
+    .music-player-static.header { top: 0; }
 
-  .player-icon {
-    height: 24px;
-    cursor: pointer;
-    margin: 0 6px 0 6px;
-    transition: all .2s ease-in-out;
-  }
-
-  .player-icon:hover { 
-    transform: scale(1.2, 1.2);
-  }
-
-  .progress-bar {
-    height: 30%;
-    background-color: white;
-    padding: 1px;
-    margin: 0 20px 0 20px;
-    cursor: pointer;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
-  }
-
-  .progress-bar-inner {
-    height: 100%;
-    background-color: $primary-color;
-  }
-
-  .song-info {
-    margin-left: 12px;
-    width: 155px;
-  }
-
-  .song-info p {
-    font-size: 14px;
-    line-height: 3px;
-  }
-
-  .song-duration-end {
-    margin-right: 10px;
-  }
-
-  .song-art {
-    height: 40px;
-    width: auto;
-    margin-left: 20px;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
-  }
-
-  .art-and-info-field {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-  }
-
-  .art-and-info-field:hover {
-    background-color: #263442;
-    cursor: pointer;
-  }
-
-  ::-webkit-scrollbar {
-    width: 0.7em;
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #263442;
-  }
-
-  ::-webkit-scrollbar-corner {
-    background-color: $primary-color;
-  }
-
-  .art-and-info-field:active {
-    background-color: #1b242e;
-  }
-
-  .catalogue {
-    position: fixed;
-    background-color: $primary-color;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    z-index: 80;
-
-    .search-input {
-      padding-left: 10px;
-      background-color: $primary-color;
+    .music-player-static {
+      background-color: $primary;
+      height: 50px;
       color: white;
-      width: 100%;
-      height: 30px;
-      font-size: 14px;
-      font-family: 'Iosevka', Helvetica, san-serif;
-      border: none;
-      outline: none;
-      box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
-    }
-
-    .search-input::placeholder {
-      color: rgb(177, 177, 177);
-    }
-
-    .catalogue-item.hidden { display: none; }
-
-    .catalogue-item {
-      width: 100%;
-      height: 40px;
-      display: grid;
-      grid-template-columns: 8% 90%;
-      font-size: 12px;
-
-      .catalogue-art {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 20px 0 20px;
-        img { height: 20px; }
-      }
-
-      .catalogue-title {
-        display: flex;
-        align-items: center;
-        margin: 0 20px 0 20px;
-      }
-    }
-
-    .catalogue-item:hover {
-      background-color: #263442;
-      cursor: pointer;
-    }
-
-    .catalogue-item:active {
-      background-color: #1b242e;
-    }
-  }
-
-  @media (max-width: 600px) {
-    .player-icon.shuffle { display: none; }
-    .progress-bar { margin: 0; }
-  }
-
-  @media (max-width: 680px) {
-    .song-duration-end { display: none; }
-    .song-duration-start { display: none; }
-  }
-}
-
-.music-player-instance.card {
-  height: 100%;
-  width: 100%;
-  background-color: $primary-color;
-  display: grid;
-  grid-template-rows: 200px 40px 260px;
-
-  ::-webkit-scrollbar {
-    width: 0.7em;
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #263442;
-  }
-  ::-webkit-scrollbar-corner {
-    background-color: $primary-color;
-  }
-
-  .search-input {
-    background: white;
-    font-size: 14px;
-    margin: 0 15px 0 15px;
-    padding:  0 5px 0 5px;
-    font-family: 'Iosevka', Helvetica, san-serif;
-    border: none;
-    outline: none;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
-  }
-
-  .song-info {
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    position: relative;
-    background: $primary-color;
-    outline: 0;
-    img {
-      position: absolute;
-      z-index: 10;
-      width: 100%;
-      transition: all .2s ease-in-out;
-    }
-    .hovered { 
-      transform: scale(1.2, 1.2);
-    }
-    .song-icon-overlay {
-      position: absolute;
-      z-index: 15;
-      top: 0;
-      height: 100%;
+      position: fixed;
       width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
+      z-index: 99;
 
-      img {
-        height: 30%;
-        width: auto;
+      .player-icon {
+        height: 24px;
+        cursor: pointer;
+        margin: 0 6px 0 6px;
+        transition: all .2s ease-in-out;
       }
-    }
-    .song-meta {
-      padding-left: 10px;
-      color: rgb(187, 185, 185);
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      height: 20px;
-      width: 100%;
-      z-index: 20;
-      background-color: rgba(0, 0, 0, 0.288);
-    }
-  }
 
-  .control {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+      .player-icon:hover { 
+        transform: scale(1.2, 1.2);
+      }
 
-    .progress-bar {
-      height: 30%;
-      background-color: white;
-      padding: 1px;
-      margin: 0 20px 0 20px;
-      cursor: pointer;
-      box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
-    }
+      .progress-bar {
+        height: 30%;
+        background-color: white;
+        padding: 1px;
+        margin: 0 20px 0 20px;
+        cursor: pointer;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+      }
 
-    .progress-bar-inner {
-      height: 100%;
-      background-color: $primary-color;
-    }
+      .progress-bar-inner {
+        height: 100%;
+        background-color: $primary;
+      }
 
-    .player-icon {
-      height: 24px;
-      cursor: pointer;
-      transition: all .2s ease-in-out;
-      margin: 0 6px 0 6px;
-    }
-    .player-icon:hover { 
-      transform: scale(1.2, 1.2);
-    }    
-  }
+      .song-info {
+        margin-left: 12px;
+        width: 155px;
+      }
 
-  .catalogue {
-    background-color: $primary-color;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    z-index: 80;
-    width: 100%;
-    height: 100%;
-    color: white;
+      .song-info p {
+        font-size: 14px;
+        line-height: 3px;
+      }
 
-    .catalogue-item.hidden { display: none; }
+      .song-duration-end {
+        margin-right: 10px;
+      }
 
-    .catalogue-item {
-      width: 100%;
-      height: 40px;
-      display: grid;
-      grid-template-columns: 8% 90%;
-      font-size: 16px;
+      .song-art {
+        height: 40px;
+        width: auto;
+        margin-left: 20px;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+      }
 
-      .catalogue-art {
+      .art-and-info-field {
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 20px 0 20px;
-        
-        img { height: 20px; }
+        font-weight: bold;
       }
 
-      .catalogue-title {
+      .art-and-info-field:hover {
+        background-color: darken($primary, 10%);
+        cursor: pointer;
+      }
+
+      ::-webkit-scrollbar {
+        width: 0.7em;
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: darken($primary, 5%);
+      }
+
+      ::-webkit-scrollbar-corner {
+        background-color: $primary;
+      }
+
+      .art-and-info-field:active {
+        background-color: darken($primary, 10%);
+      }
+
+      .catalogue {
+        position: fixed;
+        background-color: $primary;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        z-index: 80;
+
+        .search-input {
+          padding-left: 10px;
+          background-color: $primary;
+          color: white;
+          width: 100%;
+          height: 30px;
+          font-size: 14px;
+          font-family: 'Iosevka', Helvetica, san-serif;
+          border: none;
+          outline: none;
+          box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+        }
+
+        .search-input::placeholder {
+          color: rgb(177, 177, 177);
+        }
+
+        .catalogue-item.hidden { display: none; }
+
+        .catalogue-item {
+          width: 100%;
+          height: 40px;
+          display: grid;
+          grid-template-columns: 8% 90%;
+          font-size: 12px;
+
+          .catalogue-art {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 20px 0 20px;
+            img { height: 20px; }
+          }
+
+          .catalogue-title {
+            display: flex;
+            align-items: center;
+            margin: 0 20px 0 20px;
+          }
+        }
+
+        .catalogue-item:hover {
+          background-color: darken($primary, 5%);
+          cursor: pointer;
+        }
+
+        .catalogue-item.playing {
+          background-color: darken($primary, 10%);
+        }
+      }
+
+      @media (max-width: 600px) {
+        .player-icon.shuffle { display: none; }
+        .progress-bar { margin: 0; }
+      }
+
+      @media (max-width: 680px) {
+        .song-duration-end { display: none; }
+        .song-duration-start { display: none; }
+      }
+    }
+
+    .music-player-instance.card {
+      height: 100%;
+      width: 100%;
+      background-color: $primary;
+      display: grid;
+      grid-template-rows: 200px 40px 260px;
+
+      ::-webkit-scrollbar {
+        width: 0.7em;
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: darken($primary, 5%);
+      }
+      ::-webkit-scrollbar-corner {
+        background-color: $primary;
+      }
+
+      .search-input {
+        background: white;
+        font-size: 14px;
+        margin: 0 15px 0 15px;
+        padding:  0 5px 0 5px;
+        font-family: 'Iosevka', Helvetica, san-serif;
+        border: none;
+        outline: none;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+      }
+
+      .song-info {
+        overflow: hidden;
         display: flex;
         align-items: center;
-        margin: 0 20px 0 20px;
+        position: relative;
+        background: $primary;
+        outline: 0;
+        img {
+          position: absolute;
+          z-index: 10;
+          width: 100%;
+          transition: all .2s ease-in-out;
+        }
+        .hovered { 
+          transform: scale(1.2, 1.2);
+        }
+        .song-icon-overlay {
+          position: absolute;
+          z-index: 15;
+          top: 0;
+          height: 100%;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+
+          img {
+            height: 30%;
+            width: auto;
+          }
+        }
+        .song-meta {
+          padding-left: 10px;
+          color: rgb(187, 185, 185);
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          height: 20px;
+          width: 100%;
+          z-index: 20;
+          background-color: rgba(0, 0, 0, 0.288);
+        }
       }
-    }
 
-    .catalogue-item:hover {
-      background-color: #263442;
-      cursor: pointer;
-    }
+      .control {
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-    .catalogue-item:active {
-      background-color: #1b242e;
+        .progress-bar {
+          height: 30%;
+          background-color: white;
+          padding: 1px;
+          margin: 0 20px 0 20px;
+          cursor: pointer;
+          box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+        }
+
+        .progress-bar-inner {
+          height: 100%;
+          background-color: $primary;
+        }
+
+        .player-icon {
+          height: 24px;
+          cursor: pointer;
+          transition: all .2s ease-in-out;
+          margin: 0 6px 0 6px;
+        }
+        .player-icon:hover { 
+          transform: scale(1.2, 1.2);
+        }    
+      }
+
+      .catalogue {
+        background-color: $primary;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        z-index: 80;
+        width: 100%;
+        height: 100%;
+        color: white;
+
+        .catalogue-item.hidden { display: none; }
+
+        .catalogue-item {
+          width: 100%;
+          height: 40px;
+          display: grid;
+          grid-template-columns: 8% 90%;
+          font-size: 16px;
+
+          .catalogue-art {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 20px 0 20px;
+            
+            img { height: 20px; }
+          }
+
+          .catalogue-title {
+            display: flex;
+            align-items: center;
+            margin: 0 20px 0 20px;
+          }
+        }
+
+        .catalogue-item:hover {
+          background-color: darken($primary, 5%);
+          cursor: pointer;
+        }
+
+        .catalogue-item.playing {
+          background-color: darken($primary, 10%);
+        }
+      }
     }
   }
 }

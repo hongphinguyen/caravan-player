@@ -1,8 +1,8 @@
 const id3 = require('node-id3');
 const fs = require('fs');
 
-const dir = '../../src/assets/caravan-music/';
-const bankOutputDir = './src/scripts/';
+const dir = './src/assets/caravan-music/';
+const bankOutputDir = './node_modules/caravan-player/src/scripts/';
 
 /* Returns a promise that contains an array of files in a folder */
 const getFilesInFolder = directory => new Promise((resolve, reject) => {
