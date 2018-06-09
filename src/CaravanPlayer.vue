@@ -1,7 +1,7 @@
 <template>
   <div :class="`player ${color}`" :style="wrapperStyle">
     <div v-if="playerType === 'static'" :class="`music-player-static ${type}`">
-      <img class="player-icon" :src="volumeIcon" @click="onVolumeButtonClick" v-if="!noVolume">
+      <img class="player-icon" :src="volumeIcon" @click="onVolumeButtonClick">
       <img class="player-icon" :src="require('@/assets/icons/Previous.png')" 
            @click="nextOrPreviousSong(false)" alt="">
       <img class="player-icon" :src="playIcon" @click="playOrPause" alt="">
@@ -26,7 +26,7 @@
         </div>
       </div>
       <div class="catalogue" v-if="catalogue" :style="catalogueGroupSet">
-        <input v-if="!noSearch" type="text" placeholder="Search a song..."
+        <input type="text" placeholder="Search a song..."
                class="search-input" v-model="searchQuery"/>
         <div @click="changeSongTo(songBank.indexOf(song)); catalogue = !catalogue;"
              :class="`catalogue-item ${checkIfHighlight(song)} ${hiddenOnSearch(song)}`"
@@ -54,9 +54,9 @@
         </div>
       </div>
       <div class="control">
-        <img class="player-icon" :src="volumeIcon" @click="onVolumeButtonClick" v-if="!noVolume">
+        <img class="player-icon" :src="volumeIcon" @click="onVolumeButtonClick">
         <img class="player-icon" :src="require('@/assets/icons/Search.png')"
-             @click="searchMode = !searchMode" v-if="!noSearch">
+             @click="searchMode = !searchMode" alt="">
         <input v-if="searchMode" class="search-input" v-model="searchQuery"
                type="text" :style="{ height: '45%', width: `calc(${progressBarWidth}% - 10px)` }"
                @keyup.esc="searchMode = !searchMode" placeholder="Search a song..."/>
@@ -108,8 +108,6 @@ export default class CaravanPlayer extends Vue {
   @Prop({ default: '500px' }) private height!: string;
   @Prop({ default: '90%' }) private width!: string;
   @Prop({ default: 'blue' }) private color!: string;
-  @Prop({ default: false }) private noVolume!: boolean;
-  @Prop({ default: false }) private noSearch!: boolean;
   private songBank = SongBank;
   private timeUpdateListener: any;
   private duration = 0;
@@ -158,16 +156,15 @@ export default class CaravanPlayer extends Vue {
     if (!this.catalogue) {
       this.catalogueGroupSet.width = `${ref.clientWidth}px`;
       this.catalogueGroupSet.left = `${ref.offsetLeft}px`;
-      this.catalogueGroupSet.bottom = `${ref.offsetHeight + 3}px`;
+      this.catalogueGroupSet.bottom = `${ref.offsetHeight + 2}px`;
     }
     this.catalogue = !this.catalogue;
   }
-  private hiddenOnSearch(song: SongMetadata): object {
-    return {
-      hidden: this.searchQuery.length > 0
-              && !song.artist.toLowerCase().match(this.searchQuery.toLowerCase())
-              && !song.title.toLowerCase().match(this.searchQuery.toLowerCase())
-    };
+  private hiddenOnSearch(song: SongMetadata): string {
+    let check = this.searchQuery.length > 0
+                && !song.artist.toLowerCase().match(this.searchQuery.toLowerCase())
+                && !song.title.toLowerCase().match(this.searchQuery.toLowerCase());
+    return check ? 'hidden' : '';
   }
   get playIcon(): NodeRequire {
     return this.playButton === 'Play' ? require('@/assets/icons/Play.png') :
