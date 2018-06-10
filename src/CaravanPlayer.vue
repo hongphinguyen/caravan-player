@@ -338,19 +338,6 @@ $colors: (
   purple: #2f103d
 );
 
-@font-face {
-  font-family: 'Iosevka';
-  src: url('./assets/fonts/Iosevka/iosevka-regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-* {
-  font-family: 'Iosevka', Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 @each $colors, $primary in $colors {
   .player.#{$colors} {
 
