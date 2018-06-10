@@ -21,7 +21,7 @@ const getFileTags = name => new Promise((resolve, reject) => {
     title: tags.title,
     album: tags.album,
     artist: tags.artist,
-    artPath: `${tags.artist}${tags.album}.jpg`.replace(/ /g,'')
+    artPath: `${(tags.artist + tags.album).replace(/\W/g, '')}.jpg`
   });
 });
 
@@ -33,7 +33,7 @@ const getFileAlbumBuffer = name => new Promise((resolve, reject) => {
   if (name.substr(name.length - 4) !== '.mp3') { resolve(null); }
   const tags = id3.read(`${dir}${name}`);
   resolve({
-    pathName: `${tags.artist}${tags.album}.jpg`.replace(/ /g,''),
+    pathName: `${(tags.artist + tags.album).replace(/\W/g, '')}.jpg`,
     imageBuffer: tags.raw.APIC.imageBuffer
   });
 });

@@ -1,6 +1,8 @@
 # Caravan Player - VueJS music-playing component
 
-#### Please visit this [DEMO PAGE](https://caravan-player.firebaseapp.com/#/) to get an idea of how Caravan Player works.
+### Please visit this [DEMO PAGE](https://caravan-player.firebaseapp.com/#/) to get an idea of how Caravan Player works.
+
+### Please visit my [GitHub](https://github.com/phiboi/caravan-player) if you're interested in the code.
 
 #### Currenly supports Vue CLI 3.0. It will not work with older versions of Vue CLI.
 
@@ -83,4 +85,4 @@ Plug this component to the root of your Vue app (typically in App.vue) and you'l
 ```
 You can put a card player anywhere on your app as a relatively positioned music player. If the width and height props is not provided, the card player will fall back to default width of 90% and height of 400px.
 
-Enjoy! Send me an email if you have any question.
+Enjoy! Send me an email at hambaga1234@gmail.com if you have any question.
