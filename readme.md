@@ -11,9 +11,11 @@ Create a folder named 'caravan-player' (case-sensitive) in the 'assets' folder i
 ```sh
 mkdir ./src/assets/caravan-player
 ```
-#####Put all your music files into this folder. You are allowed to arrange the music files into subfolders as well. Make sure the mp3 files has the required id3 tags (title, artist name, album name) and an album art.
+##### Put all your music files into this folder. Make sure the mp3 files has the required id3 tags (title, artist name, album name) and an album art.
 
-#####  Right now only .mp3 files are allowed. I will add more audio extensions support in the future. 
+##### Thanks to a recent update, you can now arrange your music files in different subfolders as long as they're all in the caravan-player folder.
+
+##### Right now only .mp3 files are allowed. I will add more audio extensions support in the future. 
 
 Consider converting your mp3 files to 128kbp to reduce file size and improve loading speed.
 

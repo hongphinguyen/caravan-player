@@ -9,6 +9,8 @@ if (process.argv[2] === 'resync') {
   bankOutputDir = './node_modules/caravan-player/src/scripts/';
 }
 
+let artDir = musicDir + 'AlbumArtworks/'
+
 /* Returns an object of necessary tags of a single file */
 const getFileTags = file => new Promise((resolve, reject) => {
   if (!['mp3', 'm4a'].includes(file.name.substr(file.name.length - 3))) { resolve(null); }
@@ -27,7 +29,7 @@ const getFileTags = file => new Promise((resolve, reject) => {
 * comparing two buffers. They are also used to name the image file after
 * it being extracted. */
 const getFileAlbumBuffer = file => new Promise((resolve, reject) => {
-  if (file.name.substr(file.length - 4) !== '.mp3') { resolve(null); }
+  if (file.name.substr(file.name.length - 4) !== '.mp3') { resolve(null); }
   const tags = id3.read(file.directory);
   resolve({
     pathName: `${(tags.artist + tags.album).replace(/\W/g, '')}.jpg`,
@@ -35,12 +37,23 @@ const getFileAlbumBuffer = file => new Promise((resolve, reject) => {
   });
 });
 
+const filterExclamationMark = file => new Promise((resolve, reject) => {
+  if (file.name.includes('!')) {
+    fs.rename(file.directory, file.directory.replace('!', ''), () => {
+      file.name = file.name.replace('!', '');
+      file.directory = file.directory.replace('!', '');
+      resolve();
+    });
+  } else {
+    resolve();
+  }
+});
+
 /* Take an object of image buffer and the name of that buffer then
 * write it to disc */
 const createImageFromBuffer = obj => new Promise((resolve, reject) => {
-  const path = './src/assets/caravan-music/AlbumArtworks/';
-  fs.mkdir(path, null, () => {
-    fs.writeFile(path + obj.pathName, obj.imageBuffer, 'base64', err => {
+  fs.mkdir(artDir, null, () => {
+    fs.writeFile(artDir + obj.pathName, obj.imageBuffer, 'base64', err => {
       reject(new Error('Image could not be created.'));
     });
     resolve();
@@ -86,7 +99,7 @@ function checkIfFileIsFolder(file) {
   return fs.statSync(file).isDirectory();
 }
 
-async function readDirectoryRecursively(dir, arr) {
+async function readDirectoryRecursively(dir, arr, folder) {
   if (!checkIfFileIsFolder(dir)) {
     throw 'File is not a folder.'
   }
@@ -95,10 +108,10 @@ async function readDirectoryRecursively(dir, arr) {
   const files = await getFilesFromFolder(dir);
   for (const file of files) {
     if (checkIfFileIsFolder(dir + file)) {
-      await readDirectoryRecursively(dir + file + '/', arr || totalFiles);
+      await readDirectoryRecursively(dir + file + '/', arr || totalFiles, file);
     } else {
       (arr || totalFiles).push({
-        name: file,
+        name: (dir + file).slice(musicDir.length),
         directory: dir + file
       });
     }
@@ -112,6 +125,7 @@ async function main() {
   const folderTags = [];
   const albumArtsBuffers = [];
   for (const file of folder) {
+    await filterExclamationMark(file);
     const fileTags = await getFileTags(file);
     if (fileTags) { folderTags.push(fileTags); }
     const bufferTags = await getFileAlbumBuffer(file);
