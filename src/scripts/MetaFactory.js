@@ -1,23 +1,20 @@
 const id3 = require('node-id3');
 const fs = require('fs');
 
-const dir = '../../src/assets/caravan-music/';
-const bankOutputDir = './src/scripts/';
+let musicDir = '../../src/assets/caravan-music/';
+let bankOutputDir = './src/scripts/';
 
-/* Returns a promise that contains an array of files in a folder */
-const getFilesInFolder = directory => new Promise((resolve, reject) => {
-  fs.readdir(directory, (err, files) => {
-    if (err) { reject(new Error('Error. Please check your path name.')); }
-    resolve(files);
-  });
-});
+if (process.argv[2] === 'resync') {
+  musicDir = './src/assets/caravan-music/';
+  bankOutputDir = './node_modules/caravan-player/src/scripts/';
+}
 
 /* Returns an object of necessary tags of a single file */
-const getFileTags = name => new Promise((resolve, reject) => {
-  if (!['mp3', 'm4a'].includes(name.substr(name.length - 3))) { resolve(null); }
-  const tags = id3.read(`${dir}${name}`);
+const getFileTags = file => new Promise((resolve, reject) => {
+  if (!['mp3', 'm4a'].includes(file.name.substr(file.name.length - 3))) { resolve(null); }
+  const tags = id3.read(file.directory);
   resolve({
-    filePath: name,
+    filePath: file.name,
     title: tags.title,
     album: tags.album,
     artist: tags.artist,
@@ -29,9 +26,9 @@ const getFileTags = name => new Promise((resolve, reject) => {
 * are used to check if the image is a replicate without the hassle of
 * comparing two buffers. They are also used to name the image file after
 * it being extracted. */
-const getFileAlbumBuffer = name => new Promise((resolve, reject) => {
-  if (name.substr(name.length - 4) !== '.mp3') { resolve(null); }
-  const tags = id3.read(`${dir}${name}`);
+const getFileAlbumBuffer = file => new Promise((resolve, reject) => {
+  if (file.name.substr(file.length - 4) !== '.mp3') { resolve(null); }
+  const tags = id3.read(file.directory);
   resolve({
     pathName: `${(tags.artist + tags.album).replace(/\W/g, '')}.jpg`,
     imageBuffer: tags.raw.APIC.imageBuffer
@@ -41,11 +38,15 @@ const getFileAlbumBuffer = name => new Promise((resolve, reject) => {
 /* Take an object of image buffer and the name of that buffer then
 * write it to disc */
 const createImageFromBuffer = obj => new Promise((resolve, reject) => {
-  fs.writeFile(dir + obj.pathName, obj.imageBuffer, 'base64', err => {
-    reject(new Error('Image could not be created.'));
+  const path = './src/assets/caravan-music/AlbumArtworks/';
+  fs.mkdir(path, null, () => {
+    fs.writeFile(path + obj.pathName, obj.imageBuffer, 'base64', err => {
+      reject(new Error('Image could not be created.'));
+    });
+    resolve();
   });
-  resolve();
 });
+
 
 /* Write the metadata to the SongBank.ts meta file */
 const writeMetaFile = arr => new Promise((resolve, reject) => {
@@ -60,7 +61,7 @@ const writeMetaFile = arr => new Promise((resolve, reject) => {
     fileString += `    title: \`${file.title}\`,\n`;
     fileString += `    album: \`${file.album}\`,\n`;
     fileString += `    artist: \`${file.artist}\`,\n`;
-    fileString += `    art: require(\`@/assets/caravan-music/${file.artPath}\`)\n`;
+    fileString += `    art: require(\`@/assets/caravan-music/AlbumArtworks/${file.artPath}\`)\n`;
     fileString += `  }${arr.indexOf(file) === arr.length - 1 ? '' : ','}\n`;
   }
   fileString += '];\n';
@@ -70,9 +71,44 @@ const writeMetaFile = arr => new Promise((resolve, reject) => {
   resolve();
 });
 
+const getFilesFromFolder = (dir) => new Promise((resolve, reject) => {
+  if (!dir) {
+    reject('Not a directory');
+    return;
+  }
+  fs.readdir(dir, (err, files) => {
+    resolve(files);
+  });
+});
+
+function checkIfFileIsFolder(file) {
+  if (!file) { throw 'Not a file'; }
+  return fs.statSync(file).isDirectory();
+}
+
+async function readDirectoryRecursively(dir, arr) {
+  if (!checkIfFileIsFolder(dir)) {
+    throw 'File is not a folder.'
+  }
+  const totalFiles = [];
+  if (!dir) { throw 'Not a directory'; }
+  const files = await getFilesFromFolder(dir);
+  for (const file of files) {
+    if (checkIfFileIsFolder(dir + file)) {
+      await readDirectoryRecursively(dir + file + '/', arr || totalFiles);
+    } else {
+      (arr || totalFiles).push({
+        name: file,
+        directory: dir + file
+      });
+    }
+  }
+  return arr ? null : totalFiles;
+}
+
 async function main() {
   console.log('Generating meta file');
-  const folder = await getFilesInFolder(dir);
+  const folder = await readDirectoryRecursively(musicDir);
   const folderTags = [];
   const albumArtsBuffers = [];
   for (const file of folder) {

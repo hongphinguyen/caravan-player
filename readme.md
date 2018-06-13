@@ -7,13 +7,15 @@
 #### Currenly supports Vue CLI 3.0. It will not work with older versions of Vue CLI.
 
 ### Step 1: Put your music files in the designated folder (must be done before installing the package):
-Create a folder named 'caravan-player' (case-sensitive) in the 'assets' folder in your Vue project folder. The path to your music files now should be:
+Create a folder named 'caravan-player' (case-sensitive) in the 'assets' folder in your Vue project folder. Go to the root of the Vue project and run:
 ```sh
-./src/assets/caravan-player
+mkdir ./src/assets/caravan-player
 ```
-Put all your music files into this folder.  Make sure the mp3 file has the required id3 tags and an album art.
+#####Put all your music files into this folder. You are allowed to arrange the music files into subfolders as well. Make sure the mp3 files has the required id3 tags (title, artist name, album name) and an album art.
 
-#####  Right now only .mp3 files are allowed. I will add more audio extensions support in the future.
+#####  Right now only .mp3 files are allowed. I will add more audio extensions support in the future. 
+
+Consider converting your mp3 files to 128kbp to reduce file size and improve loading speed.
 
 ### Step 2: Install Caravan Player:
 ```sh
@@ -23,7 +25,7 @@ npm install --save caravan-player
 ### Step 3: Import CaravanPlayer component to your Vue application:
 
 ```js
-import CaravanPlayer from 'caravan-player/src/CaravanPlayer.vue'
+import CaravanPlayer from 'caravan-player'
 ```
 
 #### And voila, Caravan Player is now ready to ride.
@@ -59,7 +61,7 @@ And when you create a new CaravanPlayer instance, just add a *stateful* prop and
 ##### 2. Remember, every time you add a new song to the folder after the first install, the song won't be updated automatically. You can fix that by adding this to the project's package.json file:
 ```json
 "scripts": {
-  "resync": "node ./node_modules/caravan-player/src/scripts/MetaFactoryRerun"
+  "resync": "node ./node_modules/caravan-player/src/scripts/MetaFactory.js resync"
 }
 ```
 Then, every time you add a new song, just run:

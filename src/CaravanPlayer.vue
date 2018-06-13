@@ -353,7 +353,7 @@ $colors: (
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 99;
+      z-index: 9999999;
 
       .player-icon {
         height: 24px;
