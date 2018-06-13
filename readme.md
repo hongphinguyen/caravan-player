@@ -25,7 +25,7 @@ npm install --save caravan-player
 ### Step 3: Import CaravanPlayer component to your Vue application:
 
 ```js
-import CaravanPlayer from 'caravan-player'
+import CaravanPlayer from 'caravan-player/src/CaravanPlayer.vue';
 ```
 
 #### And voila, Caravan Player is now ready to ride.
