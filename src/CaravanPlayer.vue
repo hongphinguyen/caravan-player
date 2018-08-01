@@ -113,9 +113,9 @@ export default class CaravanPlayer extends Vue {
   private duration = 0;
   private currentTimeToDisplay = '00:00:00';
   private durationToDisplay = '00:00:00';
-  private progressBarWidth = this.playerType === 'static' ? 35 : 55;
+  public progressBarWidth = this.playerType === 'static' ? 35 : 55;
   private maxTextLength = 15;
-  private searchMode = false;
+  public searchMode = false;
   private searchQuery = '';
   private statelessGroupSet = {
     audio: new Audio(),
@@ -290,7 +290,7 @@ export default class CaravanPlayer extends Vue {
   }
   private playOrPause(): void {
     if (this.audio.paused) {
-      this.audio.play();
+      this.audio.play().catch(() => this.audio.pause());
       this.togglePlayPause(false);
     } else {
       this.audio.pause();
@@ -313,7 +313,7 @@ export default class CaravanPlayer extends Vue {
     this.audio.src = this.songBank[index].file;
     if (!this.audio.paused) { return; }
     if (this.audio.paused) {
-      this.audio.play();
+      this.audio.play().catch(() => this.audio.pause());
       this.togglePlayPause(false);
     }
   }
@@ -414,15 +414,24 @@ $colors: (
       }
 
       ::-webkit-scrollbar {
-        width: 0.7em;
-        background: transparent;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: darken($primary, 5%);
+        width: 20px;
       }
 
-      ::-webkit-scrollbar-corner {
-        background-color: $primary;
+      /* Track */
+      ::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 5px grey; 
+        border-radius: 10px;
+      }
+      
+      /* Handle */
+      ::-webkit-scrollbar-thumb {
+        background: black; 
+        border-radius: 10px;
+      }
+
+      /* Handle on hover */
+      ::-webkit-scrollbar-thumb:hover {
+        background: black;
       }
 
       .art-and-info-field:active {
