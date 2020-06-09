@@ -88,5 +88,3 @@ Plug this component to the root of your Vue app (typically in App.vue) and you'l
 <CaravanPlayer type="card" width="600px" height="400px"/>
 ```
 You can put a card player anywhere on your app as a relatively positioned music player. If the width and height props is not provided, the card player will fall back to default width of 90% and height of 400px.
-
-Enjoy! Send me an email at hambaga1234@gmail.com if you have any question.
